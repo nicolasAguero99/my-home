@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createMovieSchema = z
+export const createSongsSchema = z
   .array(
     z.object({
       title: z.string(),
@@ -9,12 +9,12 @@ export const createMovieSchema = z
       order: z.number().min(0),
     }),
   )
-  .min(1, 'At least one movie is required');
+  .min(1, 'At least one song is required');
 
-export type CreateMovieDTO = z.infer<typeof createMovieSchema>;
+export type CreateSongsDTO = z.infer<typeof createSongsSchema>;
 
-export const updateMovieSchema = z.object({
-  created: createMovieSchema.optional(),
+export const updateSongsSchema = z.object({
+  created: createSongsSchema.optional(),
   updated: z.array(
     z.object({
       id: z.string(),
@@ -27,4 +27,4 @@ export const updateMovieSchema = z.object({
   deleted: z.array(z.string()),
 });
 
-export type UpdateMovieDTO = z.infer<typeof updateMovieSchema>;
+export type UpdateSongsDTO = z.infer<typeof updateSongsSchema>;

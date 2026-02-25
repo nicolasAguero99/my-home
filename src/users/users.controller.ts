@@ -6,22 +6,25 @@ import {
   Patch,
   Param,
   Delete,
-  BadRequestException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { type CreateUserDTO, createUserSchema } from 'src/schemas/user.schema';
+import { ZodValidationPipe } from 'src/prisma/zod-pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(FileInterceptor('profilePicture'))
   @Post()
-  create(@Body() body: CreateUserDTO) {
-    const parsedBody = createUserSchema.safeParse(body);
-    if (!parsedBody.success) {
-      throw new BadRequestException(parsedBody.error.format());
-    }
-    return this.usersService.create(parsedBody.data);
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body(new ZodValidationPipe(createUserSchema)) body: CreateUserDTO,
+  ) {
+    return this.usersService.create(body, file);
   }
 
   @Get()

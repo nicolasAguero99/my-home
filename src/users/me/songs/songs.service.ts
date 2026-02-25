@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { type UpdateMovieDTO } from '../../../schemas/movies.schema';
+import { type UpdateSongsDTO } from 'src/schemas/songs.schema';
 import { updateData } from 'src/common/utils/update-data';
 
 @Injectable()
-export class MoviesService {
+export class SongsService {
   constructor(private prisma: PrismaService) {}
 
-  async update(data: UpdateMovieDTO, userId: string) {
+  async update(data: UpdateSongsDTO, userId: string) {
     await updateData({
       prisma: this.prisma,
-      model: 'Movies',
+      model: 'Songs',
       userId,
       data,
     });
-    return { message: 'Movies updated successfully' };
+    return { message: 'Songs updated successfully' };
   }
 }

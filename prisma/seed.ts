@@ -14,7 +14,7 @@ async function main() {
   await prisma.user.deleteMany();
 
   const mockUsers = Array.from({ length: 10 }, (_, index) => ({
-    id: String(index),
+    id: index == 0 ? 'f34e751d-ee7c-410f-a898-e08a5fb4fdbc' : String(index),
     username: faker.internet.username(),
     email: faker.internet.email(),
     password: faker.internet.password(),
@@ -59,6 +59,21 @@ async function main() {
   });
 
   if (!createdMovies) throw new Error('Failed to create movies');
+
+  const mockSongs = Array.from({ length: 5 }, (_, index) => ({
+    id: String(index),
+    title: faker.lorem.word(),
+    image: faker.image.url(),
+    link: faker.internet.url(),
+    order: index + 1,
+    userId: createdUsers[0].id,
+  }));
+
+  const createdSongs = await prisma.songs.createMany({
+    data: mockSongs,
+  });
+
+  if (!createdSongs) throw new Error('Failed to create songs');
 
   console.log('Seeded successfully');
 }

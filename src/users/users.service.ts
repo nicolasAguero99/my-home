@@ -1,11 +1,24 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDTO } from 'src/schemas/user.schema';
+import { ImageService } from 'src/common/image/image.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
-  async create(data: CreateUserDTO) {
+  constructor(
+    private prisma: PrismaService,
+    private imageService: ImageService,
+  ) {}
+
+  async create(data: CreateUserDTO, file: Express.Multer.File) {
+    const dataToCreate = data;
+
+    const { fileName, error: uploadError } =
+      await this.imageService.uploadProfilePicture(file);
+
+    if (!uploadError) dataToCreate.profilePicture = fileName ?? '';
+    else dataToCreate.profilePicture = '';
+
     const isUserExist = await this.prisma.user.findUnique({
       where: { username: data.username },
     });
@@ -19,10 +32,13 @@ export class UsersService {
     }
 
     const user = await this.prisma.user.create({
-      data,
+      data: dataToCreate,
     });
 
-    return user;
+    return {
+      user,
+      ...(uploadError && { warning: 'Profile picture not uploaded' }),
+    };
   }
 
   findAll() {
